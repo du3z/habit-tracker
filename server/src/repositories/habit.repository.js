@@ -19,11 +19,25 @@ export const habitRepository = {
     return rows[0];
   },
 
-  async findAllByUser(userId, { includeArchived = false } = {}) {
+  async findAllByUser(userId, { includeArchived = false, search = "", type = "" } = {}) {
+    const conditions = ["user_id = $1"];
+    const params = [userId];
+
+    if (!includeArchived) {
+      conditions.push("archived = false");
+    }
+    if (search) {
+      params.push(`%${search}%`);
+      conditions.push(`title ILIKE $${params.length}`);
+    }
+    if (type) {
+      params.push(type);
+      conditions.push(`type = $${params.length}`);
+    }
+
     const { rows } = await query(
-      `SELECT * FROM habits WHERE user_id = $1 ${includeArchived ? "" : "AND archived = false"}
-       ORDER BY created_at DESC`,
-      [userId]
+      `SELECT * FROM habits WHERE ${conditions.join(" AND ")} ORDER BY created_at DESC`,
+      params
     );
     return rows;
   },

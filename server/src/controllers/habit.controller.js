@@ -3,7 +3,12 @@ import { habitService } from "../services/habit.service.js";
 export const habitController = {
   async list(req, res, next) {
     try {
-      const habits = await habitService.list(req.userId);
+      const { search = "", type = "", archived } = req.query;
+      const includeArchived = archived === "true" || archived === "only";
+      let habits = await habitService.list(req.userId, { includeArchived, search, type });
+      if (archived === "only") {
+        habits = habits.filter((h) => h.archived);
+      }
       res.json({ habits });
     } catch (err) {
       next(err);

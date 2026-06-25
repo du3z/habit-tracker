@@ -12,8 +12,8 @@ async function assertOwnership(habitId, userId) {
 }
 
 export const habitService = {
-  async list(userId) {
-    return habitRepository.findAllByUser(userId);
+  async list(userId, filters) {
+    return habitRepository.findAllByUser(userId, filters);
   },
 
   async create(userId, data) {
