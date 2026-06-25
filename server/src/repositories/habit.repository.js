@@ -1,0 +1,65 @@
+import { query } from "../config/db.js";
+
+export const habitRepository = {
+  async create(userId, data) {
+    const { rows } = await query(
+      `INSERT INTO habits (user_id, title, description, type, color, target_days, start_date)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       RETURNING *`,
+      [
+        userId,
+        data.title,
+        data.description || null,
+        data.type,
+        data.color,
+        data.target_days,
+        data.start_date,
+      ]
+    );
+    return rows[0];
+  },
+
+  async findAllByUser(userId, { includeArchived = false } = {}) {
+    const { rows } = await query(
+      `SELECT * FROM habits WHERE user_id = $1 ${includeArchived ? "" : "AND archived = false"}
+       ORDER BY created_at DESC`,
+      [userId]
+    );
+    return rows;
+  },
+
+  async findById(id) {
+    const { rows } = await query(`SELECT * FROM habits WHERE id = $1`, [id]);
+    return rows[0] || null;
+  },
+
+  async update(id, data) {
+    const { rows } = await query(
+      `UPDATE habits SET
+        title = COALESCE($1, title),
+        description = COALESCE($2, description),
+        type = COALESCE($3, type),
+        color = COALESCE($4, color),
+        target_days = COALESCE($5, target_days),
+        start_date = COALESCE($6, start_date),
+        archived = COALESCE($7, archived)
+       WHERE id = $8
+       RETURNING *`,
+      [
+        data.title,
+        data.description,
+        data.type,
+        data.color,
+        data.target_days,
+        data.start_date,
+        data.archived,
+        id,
+      ]
+    );
+    return rows[0] || null;
+  },
+
+  async remove(id) {
+    await query(`DELETE FROM habits WHERE id = $1`, [id]);
+  },
+};
