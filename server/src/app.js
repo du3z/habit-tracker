@@ -3,6 +3,7 @@ import cors from "cors";
 import { env } from "./config/env.js";
 import authRoutes from "./routes/auth.routes.js";
 import habitRoutes from "./routes/habit.routes.js";
+import statsRoutes from "./routes/stats.routes.js";
 import { errorMiddleware } from "./middlewares/error.middleware.js";
 
 export const app = express();
@@ -14,5 +15,6 @@ app.get("/api/health", (req, res) => res.json({ ok: true }));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/habits", habitRoutes);
+app.use("/api/stats", statsRoutes);
 
 app.use(errorMiddleware);
