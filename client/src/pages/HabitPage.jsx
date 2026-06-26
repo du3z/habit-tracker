@@ -66,13 +66,13 @@ export default function HabitPage() {
 
       <button
         onClick={handleToggleToday}
-        className={`mb-8 text-sm font-medium rounded-md px-4 py-2 ${
+        className={`mb-8 text-sm font-medium rounded-md px-4 py-2 transition-colors ${
           doneToday
-            ? "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400"
+            ? "bg-white dark:bg-slate-800 border border-red-300 dark:border-red-500/50 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
             : "bg-indigo-600 text-white hover:bg-indigo-700"
         }`}
       >
-        {doneToday ? "✓ Выполнено сегодня" : "Отметить выполнено сегодня"}
+        {doneToday ? "✓ Выполнено · удалить отметку" : "Отметить выполнено сегодня"}
       </button>
 
       <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5 mb-6">
