@@ -4,10 +4,16 @@ import { habitsApi } from "../api/habits.api.js";
 export const useHabitStore = create((set, get) => ({
   habits: [],
   loading: false,
+  filters: { search: "", type: "", archived: "false" },
 
-  async fetchHabits() {
+  setFilters(partial) {
+    set({ filters: { ...get().filters, ...partial } });
+  },
+
+  async fetchHabits(overrideFilters) {
     set({ loading: true });
-    const habits = await habitsApi.list();
+    const filters = overrideFilters || get().filters;
+    const habits = await habitsApi.list(filters);
     set({ habits, loading: false });
   },
 
@@ -29,5 +35,15 @@ export const useHabitStore = create((set, get) => ({
 
   async toggleHabit(id, date) {
     await habitsApi.toggle(id, date);
+  },
+
+  async archiveHabit(id) {
+    await habitsApi.archive(id);
+    set({ habits: get().habits.filter((h) => h.id !== id) });
+  },
+
+  async restoreHabit(id) {
+    await habitsApi.restore(id);
+    set({ habits: get().habits.filter((h) => h.id !== id) });
   },
 }));
