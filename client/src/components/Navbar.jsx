@@ -23,6 +23,9 @@ export default function Navbar() {
         <Link to="/analytics" className="text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 text-sm">
           Аналитика
         </Link>
+        <Link to="/history" className="text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 text-sm">
+          История
+        </Link>
       </div>
       <div className="flex items-center gap-3">
         <span className="text-sm text-slate-500 dark:text-slate-400">{user?.email}</span>
