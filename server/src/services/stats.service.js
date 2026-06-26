@@ -81,8 +81,8 @@ export const statsService = {
     };
   },
 
-  async history(userId, limit = 200) {
-    const rows = await habitLogRepository.findCompletedHistory(userId, limit);
+  async history(userId, limit = 200, options = {}) {
+    const rows = await habitLogRepository.findCompletedHistory(userId, limit, options);
     return rows.map((r) => ({
       date: r.date.toISOString().slice(0, 10),
       habitId: r.habit_id,

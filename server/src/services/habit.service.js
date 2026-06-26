@@ -30,6 +30,16 @@ export const habitService = {
     await habitRepository.remove(habitId);
   },
 
+  async complete(userId, habitId) {
+    await assertOwnership(habitId, userId);
+    return habitRepository.markCompleted(habitId);
+  },
+
+  async reopen(userId, habitId) {
+    await assertOwnership(habitId, userId);
+    return habitRepository.markActive(habitId);
+  },
+
   async toggle(userId, habitId, date) {
     await assertOwnership(habitId, userId);
     return habitLogRepository.upsertToggle(habitId, date);

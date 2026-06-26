@@ -22,7 +22,8 @@ export const statsController = {
   async history(req, res, next) {
     try {
       const limit = req.query.limit ? parseInt(req.query.limit, 10) : 200;
-      const history = await statsService.history(req.userId, limit);
+      const onlyActive = req.query.onlyActive === "true";
+      const history = await statsService.history(req.userId, limit, { onlyActive });
       res.json({ history });
     } catch (err) {
       next(err);

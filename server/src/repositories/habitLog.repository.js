@@ -30,12 +30,13 @@ export const habitLogRepository = {
     return { date, completed: true };
   },
 
-  async findCompletedHistory(userId, limit = 200) {
+  async findCompletedHistory(userId, limit = 200, { onlyActive = false } = {}) {
+    const statusFilter = onlyActive ? "AND h.archived = false AND h.completed = false" : "";
     const { rows } = await query(
       `SELECT hl.date, hl.created_at, h.id AS habit_id, h.title, h.color
        FROM habit_logs hl
        JOIN habits h ON h.id = hl.habit_id
-       WHERE h.user_id = $1 AND hl.completed = true
+       WHERE h.user_id = $1 AND hl.completed = true ${statusFilter}
        ORDER BY hl.date DESC, hl.created_at DESC
        LIMIT $2`,
       [userId, limit]

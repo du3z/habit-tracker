@@ -29,6 +29,8 @@ router.get("/", habitController.list);
 router.post("/", validate(habitSchema), habitController.create);
 router.put("/:id", validate(habitUpdateSchema), habitController.update);
 router.delete("/:id", habitController.remove);
+router.post("/:id/complete", habitController.complete);
+router.post("/:id/reopen", habitController.reopen);
 router.post("/:id/toggle", validate(toggleSchema), habitController.toggle);
 router.get("/:id/logs", habitController.logs);
 

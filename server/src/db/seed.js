@@ -25,7 +25,8 @@ async function seed() {
   const start = new Date(today);
   start.setDate(start.getDate() - DAYS_HISTORY);
 
-  // probability(date) функции — управляют тем, насколько "реалистично" выглядят данные
+  // startedDaysAgo / endedDaysAgo — задают "активный" период привычки относительно сегодня.
+  // Если не заданы — привычка активна весь период истории (90 дней) и до сих пор.
   const habitsToCreate = [
     {
       title: "Читать 30 минут",
@@ -34,6 +35,7 @@ async function seed() {
       color: "#6366f1",
       target_days: 90,
       archived: false,
+      completed: false,
       // высокая и стабильная успешность, чуть растёт со временем (привычка закрепляется)
       probability: (daysAgo) => 0.55 + (DAYS_HISTORY - daysAgo) / DAYS_HISTORY * 0.35,
       forcedRecentStreakDays: 6,
@@ -45,13 +47,13 @@ async function seed() {
       color: "#22c55e",
       target_days: 90,
       archived: false,
+      completed: false,
       // явно выше по будням, ниже в выходные — чтобы был виден паттерн по дням недели
       probability: (daysAgo, date) => {
         const weekday = date.getDay(); // 0 = вс, 6 = сб
         const isWeekend = weekday === 0 || weekday === 6;
         return isWeekend ? 0.2 : 0.65;
       },
-      forcedRecentStreakDays: 0,
     },
     {
       title: "Учить английский",
@@ -60,6 +62,7 @@ async function seed() {
       color: "#f59e0b",
       target_days: 90,
       archived: false,
+      completed: false,
       // низкая успешность, с явным провалом в середине периода (бросил и вернулся)
       probability: (daysAgo) => (daysAgo > 30 && daysAgo < 55 ? 0.05 : 0.4),
       forcedRecentStreakDays: 3,
@@ -71,8 +74,8 @@ async function seed() {
       color: "#ec4899",
       target_days: 60,
       archived: false,
+      completed: false,
       probability: () => 0.5,
-      forcedRecentStreakDays: 0,
     },
     {
       title: "Бросить сладкое",
@@ -81,18 +84,44 @@ async function seed() {
       color: "#94a3b8",
       target_days: 30,
       archived: true, // демонстрация архивной привычки
+      completed: false,
       probability: () => 0.3,
-      forcedRecentStreakDays: 0,
-      // эта привычка "жила" только первые 30 дней периода
-      activeDaysAgoMin: 60,
+      endedDaysAgo: 60, // активна была только в первой части периода
+    },
+    {
+      title: "Отжимания 100 раз в день",
+      description: "Челлендж на 30 дней — цель достигнута!",
+      type: "daily",
+      color: "#0ea5e9",
+      target_days: 30,
+      archived: false,
+      completed: true, // демонстрация завершённой привычки (цель достигнута)
+      probability: () => 0.9,
+      startedDaysAgo: 50, // челлендж шёл с 50-го по 20-й день назад
+      endedDaysAgo: 20,
     },
   ];
 
   for (const h of habitsToCreate) {
+    const completedAt = h.completed
+      ? isoDate(new Date(today.getTime() - (h.endedDaysAgo || 0) * 86400000))
+      : null;
+
     const { rows } = await query(
-      `INSERT INTO habits (user_id, title, description, type, color, target_days, start_date, archived)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
-      [userId, h.title, h.description, h.type, h.color, h.target_days, isoDate(start), h.archived]
+      `INSERT INTO habits (user_id, title, description, type, color, target_days, start_date, archived, completed, completed_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id`,
+      [
+        userId,
+        h.title,
+        h.description,
+        h.type,
+        h.color,
+        h.target_days,
+        isoDate(start),
+        h.archived,
+        !!h.completed,
+        completedAt,
+      ]
     );
     const habitId = rows[0].id;
 
@@ -103,13 +132,13 @@ async function seed() {
 
       const daysAgo = Math.round((today - date) / (1000 * 60 * 60 * 24));
 
-      // для архивных "старых" привычек генерируем логи только в их активный период
-      if (h.activeDaysAgoMin && daysAgo < h.activeDaysAgoMin) continue;
+      if (h.startedDaysAgo !== undefined && daysAgo > h.startedDaysAgo) continue;
+      if (h.endedDaysAgo !== undefined && daysAgo < h.endedDaysAgo) continue;
 
-      const forced = h.forcedRecentStreakDays > 0 && daysAgo <= h.forcedRecentStreakDays;
-      const completed = forced ? true : Math.random() < h.probability(daysAgo, date);
+      const forced = h.forcedRecentStreakDays && daysAgo <= h.forcedRecentStreakDays;
+      const completedLog = forced ? true : Math.random() < h.probability(daysAgo, date);
 
-      if (completed) {
+      if (completedLog) {
         await query(
           `INSERT INTO habit_logs (habit_id, date, completed) VALUES ($1, $2, true)
            ON CONFLICT (habit_id, date) DO NOTHING`,
@@ -123,7 +152,7 @@ async function seed() {
   console.log("   Тестовый пользователь:");
   console.log(`     email:    ${TEST_EMAIL}`);
   console.log(`     password: ${TEST_PASSWORD}`);
-  console.log("   Данные: 4 активные привычки за 90 дней + 1 архивная привычка.");
+  console.log("   Данные: 4 активные привычки, 1 архивная, 1 завершённая — за 90 дней истории.");
 
   await pool.end();
 }

@@ -19,13 +19,25 @@ export const habitRepository = {
     return rows[0];
   },
 
-  async findAllByUser(userId, { includeArchived = false, search = "", type = "" } = {}) {
+  /**
+   * view:
+   *  - "active"    (по умолчанию) — не в архиве и не завершена
+   *  - "archived"  — только архивные
+   *  - "completed" — только завершённые (цель достигнута)
+   *  - "all"       — без фильтра по статусу
+   */
+  async findAllByUser(userId, { view = "active", search = "", type = "" } = {}) {
     const conditions = ["user_id = $1"];
     const params = [userId];
 
-    if (!includeArchived) {
-      conditions.push("archived = false");
+    if (view === "active") {
+      conditions.push("archived = false AND completed = false");
+    } else if (view === "archived") {
+      conditions.push("archived = true");
+    } else if (view === "completed") {
+      conditions.push("completed = true");
     }
+
     if (search) {
       params.push(`%${search}%`);
       conditions.push(`title ILIKE $${params.length}`);
@@ -69,6 +81,24 @@ export const habitRepository = {
         data.archived,
         id,
       ]
+    );
+    return rows[0] || null;
+  },
+
+  async markCompleted(id) {
+    const { rows } = await query(
+      `UPDATE habits SET completed = true, completed_at = now(), archived = false
+       WHERE id = $1 RETURNING *`,
+      [id]
+    );
+    return rows[0] || null;
+  },
+
+  async markActive(id) {
+    const { rows } = await query(
+      `UPDATE habits SET completed = false, completed_at = NULL
+       WHERE id = $1 RETURNING *`,
+      [id]
     );
     return rows[0] || null;
   },

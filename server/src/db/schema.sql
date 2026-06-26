@@ -17,8 +17,14 @@ CREATE TABLE IF NOT EXISTS habits (
   target_days INT NOT NULL DEFAULT 30,
   start_date DATE NOT NULL DEFAULT CURRENT_DATE,
   archived BOOLEAN NOT NULL DEFAULT false,
+  completed BOOLEAN NOT NULL DEFAULT false,
+  completed_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- идемпотентные миграции для уже существующих баз (повторный npm run migrate безопасен)
+ALTER TABLE habits ADD COLUMN IF NOT EXISTS completed BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE habits ADD COLUMN IF NOT EXISTS completed_at TIMESTAMPTZ;
 
 CREATE TABLE IF NOT EXISTS habit_logs (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

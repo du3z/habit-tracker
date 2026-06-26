@@ -3,12 +3,8 @@ import { habitService } from "../services/habit.service.js";
 export const habitController = {
   async list(req, res, next) {
     try {
-      const { search = "", type = "", archived } = req.query;
-      const includeArchived = archived === "true" || archived === "only";
-      let habits = await habitService.list(req.userId, { includeArchived, search, type });
-      if (archived === "only") {
-        habits = habits.filter((h) => h.archived);
-      }
+      const { search = "", type = "", view = "active" } = req.query;
+      const habits = await habitService.list(req.userId, { view, search, type });
       res.json({ habits });
     } catch (err) {
       next(err);
@@ -37,6 +33,24 @@ export const habitController = {
     try {
       await habitService.remove(req.userId, req.params.id);
       res.status(204).send();
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async complete(req, res, next) {
+    try {
+      const habit = await habitService.complete(req.userId, req.params.id);
+      res.json({ habit });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async reopen(req, res, next) {
+    try {
+      const habit = await habitService.reopen(req.userId, req.params.id);
+      res.json({ habit });
     } catch (err) {
       next(err);
     }
