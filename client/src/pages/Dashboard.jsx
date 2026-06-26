@@ -22,11 +22,13 @@ export default function Dashboard() {
     toggleHabit,
     archiveHabit,
     restoreHabit,
+    completeHabit,
     filters,
     setFilters,
   } = useHabitStore();
 
   const [statsById, setStatsById] = useState({});
+  // logsById хранит ПОДТВЕРЖДЁННОЕ сервером состояние "отметка на сегодня" по каждой привычке
   const [logsById, setLogsById] = useState({});
   const [showForm, setShowForm] = useState(false);
   const [showArchived, setShowArchived] = useState(false);
@@ -38,15 +40,17 @@ export default function Dashboard() {
     fetchHabits();
   }, [filters.search, filters.type]);
 
+  // первичная загрузка статистики и статуса "отмечено сегодня" — только когда меняется набор привычек
   useEffect(() => {
     if (habits.length === 0) {
       setStatsById({});
+      setLogsById({});
       return;
     }
-    loadStats();
+    loadStatsAndTodayStatus();
   }, [habits.map((h) => h.id).join(",")]);
 
-  async function loadStats() {
+  async function loadStatsAndTodayStatus() {
     const data = await statsApi.overview();
     setOverview(data);
     const byId = {};
@@ -58,14 +62,24 @@ export default function Dashboard() {
       habits.map(async (h) => {
         const detail = await statsApi.forHabit(h.id);
         const todayLog = detail.logs.find((l) => l.date === today && l.completed);
-        return [h.id, { [today]: !!todayLog }];
+        return [h.id, !!todayLog];
       })
     );
     setLogsById(Object.fromEntries(logsEntries));
   }
 
+  // обновляет только цифры статистики (стрики/%), не трогая logsById —
+  // чтобы не было гонки с оптимистичным/подтверждённым состоянием кнопки
+  async function refreshStatsOnly() {
+    const data = await statsApi.overview();
+    setOverview(data);
+    const byId = {};
+    data.habits.forEach((h) => (byId[h.id] = h));
+    setStatsById(byId);
+  }
+
   async function loadArchived() {
-    const list = await habitsApi.list({ archived: "only" });
+    const list = await habitsApi.list({ view: "archived" });
     setArchivedHabits(list);
   }
 
@@ -80,20 +94,23 @@ export default function Dashboard() {
     await createHabit(form);
     setForm({ title: "", description: "", type: "daily", color: "#6366f1" });
     setShowForm(false);
-    loadStats();
+    refreshStatsOnly();
   }
 
   async function handleToggle(id, date) {
-    await toggleHabit(id, date);
-    setLogsById((prev) => ({
-      ...prev,
-      [id]: { ...prev[id], [date]: !prev[id]?.[date] },
-    }));
-    loadStats();
+    // ждём подтверждённый сервером результат и используем его напрямую —
+    // никаких догадок о новом состоянии на клиенте
+    const result = await toggleHabit(id, date);
+    setLogsById((prev) => ({ ...prev, [id]: result.completed }));
+    refreshStatsOnly();
   }
 
   async function handleArchive(id) {
     await archiveHabit(id);
+  }
+
+  async function handleComplete(id) {
+    await completeHabit(id);
   }
 
   async function handleRestore(id) {
@@ -239,9 +256,10 @@ export default function Dashboard() {
               key={habit.id}
               habit={habit}
               stats={statsById[habit.id]}
-              doneToday={!!logsById[habit.id]?.[todayISO()]}
+              doneToday={!!logsById[habit.id]}
               onToggle={handleToggle}
               onArchive={handleArchive}
+              onComplete={handleComplete}
               onDelete={removeHabit}
             />
           ))}

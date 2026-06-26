@@ -10,4 +10,6 @@ export const habitsApi = {
   logs: (id) => api.get(`/habits/${id}/logs`).then((r) => r.data.logs),
   archive: (id) => api.put(`/habits/${id}`, { archived: true }).then((r) => r.data.habit),
   restore: (id) => api.put(`/habits/${id}`, { archived: false }).then((r) => r.data.habit),
+  complete: (id) => api.post(`/habits/${id}/complete`).then((r) => r.data.habit),
+  reopen: (id) => api.post(`/habits/${id}/reopen`).then((r) => r.data.habit),
 };

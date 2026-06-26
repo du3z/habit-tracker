@@ -30,6 +30,16 @@ export default function HabitPage() {
     load();
   }
 
+  async function handleArchive() {
+    await habitsApi.archive(id);
+    navigate("/");
+  }
+
+  async function handleComplete() {
+    await habitsApi.complete(id);
+    navigate("/");
+  }
+
   if (error) {
     return (
       <div className="max-w-3xl mx-auto px-6 py-8">
@@ -52,9 +62,27 @@ export default function HabitPage() {
         ← Назад на дашборд
       </button>
 
-      <div className="flex items-center gap-3 mb-1">
-        <span className="w-3 h-3 rounded-full" style={{ backgroundColor: habit.color }} />
-        <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">{habit.title}</h1>
+      <div className="flex items-center justify-between mb-1">
+        <div className="flex items-center gap-3">
+          <span className="w-3 h-3 rounded-full" style={{ backgroundColor: habit.color }} />
+          <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">{habit.title}</h1>
+        </div>
+        <div className="flex gap-3">
+          <button
+            onClick={handleComplete}
+            className="text-sm text-slate-500 dark:text-slate-400 hover:text-sky-500 dark:hover:text-sky-400"
+            title="Завершить привычку (цель достигнута)"
+          >
+            🏁 Завершить
+          </button>
+          <button
+            onClick={handleArchive}
+            className="text-sm text-slate-500 dark:text-slate-400 hover:text-amber-500 dark:hover:text-amber-400"
+            title="Архивировать привычку"
+          >
+            🗄 Архивировать
+          </button>
+        </div>
       </div>
       {habit.description && <p className="text-slate-500 dark:text-slate-400 mb-6">{habit.description}</p>}
 

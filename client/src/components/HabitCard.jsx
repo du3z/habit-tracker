@@ -8,7 +8,7 @@ const TYPE_LABELS = {
   custom: "N раз в неделю",
 };
 
-export default function HabitCard({ habit, stats, doneToday, onToggle, onArchive, onDelete }) {
+export default function HabitCard({ habit, stats, doneToday, onToggle, onArchive, onComplete, onDelete }) {
   return (
     <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-5 flex flex-col gap-3 shadow-sm transition-colors">
       <div className="flex items-start justify-between">
@@ -31,6 +31,13 @@ export default function HabitCard({ habit, stats, doneToday, onToggle, onArchive
           )}
         </div>
         <div className="flex gap-2 shrink-0">
+          <button
+            onClick={() => onComplete(habit.id)}
+            className="text-slate-400 dark:text-slate-500 hover:text-sky-500 dark:hover:text-sky-400 text-sm"
+            title="Завершить привычку (цель достигнута)"
+          >
+            🏁
+          </button>
           <button
             onClick={() => onArchive(habit.id)}
             className="text-slate-400 dark:text-slate-500 hover:text-amber-500 dark:hover:text-amber-400 text-sm"

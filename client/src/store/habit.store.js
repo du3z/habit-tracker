@@ -4,7 +4,7 @@ import { habitsApi } from "../api/habits.api.js";
 export const useHabitStore = create((set, get) => ({
   habits: [],
   loading: false,
-  filters: { search: "", type: "", archived: "false" },
+  filters: { search: "", type: "", view: "active" },
 
   setFilters(partial) {
     set({ filters: { ...get().filters, ...partial } });
@@ -15,6 +15,7 @@ export const useHabitStore = create((set, get) => ({
     const filters = overrideFilters || get().filters;
     const habits = await habitsApi.list(filters);
     set({ habits, loading: false });
+    return habits;
   },
 
   async createHabit(data) {
@@ -33,8 +34,11 @@ export const useHabitStore = create((set, get) => ({
     set({ habits: get().habits.filter((h) => h.id !== id) });
   },
 
+  // возвращает подтверждённый сервером результат { date, completed },
+  // чтобы UI не угадывал состояние, а брал его напрямую из ответа API
   async toggleHabit(id, date) {
-    await habitsApi.toggle(id, date);
+    const result = await habitsApi.toggle(id, date);
+    return result;
   },
 
   async archiveHabit(id) {
@@ -44,6 +48,16 @@ export const useHabitStore = create((set, get) => ({
 
   async restoreHabit(id) {
     await habitsApi.restore(id);
+    set({ habits: get().habits.filter((h) => h.id !== id) });
+  },
+
+  async completeHabit(id) {
+    await habitsApi.complete(id);
+    set({ habits: get().habits.filter((h) => h.id !== id) });
+  },
+
+  async reopenHabit(id) {
+    await habitsApi.reopen(id);
     set({ habits: get().habits.filter((h) => h.id !== id) });
   },
 }));
