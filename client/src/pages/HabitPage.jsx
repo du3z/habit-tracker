@@ -33,30 +33,30 @@ export default function HabitPage() {
   if (error) {
     return (
       <div className="max-w-3xl mx-auto px-6 py-8">
-        <p className="text-red-500">{error}</p>
-        <button onClick={() => navigate("/")} className="text-indigo-600 text-sm mt-2">
+        <p className="text-red-500 dark:text-red-400">{error}</p>
+        <button onClick={() => navigate("/")} className="text-indigo-600 dark:text-indigo-400 text-sm mt-2">
           ← Назад на дашборд
         </button>
       </div>
     );
   }
 
-  if (!data) return <div className="px-6 py-8 text-slate-500">Загрузка...</div>;
+  if (!data) return <div className="px-6 py-8 text-slate-500 dark:text-slate-400">Загрузка...</div>;
 
   const { habit, stats, logs, weekly } = data;
   const doneToday = logs.find((l) => l.date === todayISO() && l.completed);
 
   return (
     <div className="max-w-3xl mx-auto px-6 py-8">
-      <button onClick={() => navigate("/")} className="text-indigo-600 text-sm mb-4">
+      <button onClick={() => navigate("/")} className="text-indigo-600 dark:text-indigo-400 text-sm mb-4">
         ← Назад на дашборд
       </button>
 
       <div className="flex items-center gap-3 mb-1">
         <span className="w-3 h-3 rounded-full" style={{ backgroundColor: habit.color }} />
-        <h1 className="text-2xl font-bold text-slate-800">{habit.title}</h1>
+        <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">{habit.title}</h1>
       </div>
-      {habit.description && <p className="text-slate-500 mb-6">{habit.description}</p>}
+      {habit.description && <p className="text-slate-500 dark:text-slate-400 mb-6">{habit.description}</p>}
 
       <div className="grid grid-cols-3 gap-4 mb-8">
         <StatBox label="Текущий стрик" value={stats.currentStreak} />
@@ -68,19 +68,19 @@ export default function HabitPage() {
         onClick={handleToggleToday}
         className={`mb-8 text-sm font-medium rounded-md px-4 py-2 ${
           doneToday
-            ? "bg-emerald-100 text-emerald-700"
+            ? "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400"
             : "bg-indigo-600 text-white hover:bg-indigo-700"
         }`}
       >
         {doneToday ? "✓ Выполнено сегодня" : "Отметить выполнено сегодня"}
       </button>
 
-      <div className="bg-white border border-slate-200 rounded-xl p-5 mb-6">
+      <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5 mb-6">
         <Calendar logs={logs} color={habit.color} />
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-xl p-5">
-        <h4 className="text-sm font-medium text-slate-600 mb-2">Выполнение по неделям</h4>
+      <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5">
+        <h4 className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-2">Выполнение по неделям</h4>
         <WeeklyBarChart data={weekly} color={habit.color} />
       </div>
     </div>
@@ -89,9 +89,9 @@ export default function HabitPage() {
 
 function StatBox({ label, value }) {
   return (
-    <div className="bg-white border border-slate-200 rounded-xl p-4 text-center">
-      <p className="text-xs text-slate-500">{label}</p>
-      <p className="text-xl font-bold text-slate-800">{value}</p>
+    <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 text-center">
+      <p className="text-xs text-slate-500 dark:text-slate-400">{label}</p>
+      <p className="text-xl font-bold text-slate-800 dark:text-slate-100">{value}</p>
     </div>
   );
 }

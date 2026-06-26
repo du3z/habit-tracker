@@ -30,36 +30,36 @@ export default function Analytics() {
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-8">
-      <h1 className="text-2xl font-bold text-slate-800 mb-6">Аналитика</h1>
+      <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-6">Аналитика</h1>
 
       {overview && (
-        <div className="bg-white border border-slate-200 rounded-xl p-5 mb-8">
-          <h2 className="font-semibold text-slate-700 mb-3">Сводка по всем привычкам</h2>
+        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5 mb-8">
+          <h2 className="font-semibold text-slate-700 dark:text-slate-200 mb-3">Сводка по всем привычкам</h2>
           <div className="grid grid-cols-3 gap-4 text-sm">
             <div>
-              <p className="text-slate-500">Всего привычек</p>
-              <p className="text-lg font-bold">{overview.totalHabits}</p>
+              <p className="text-slate-500 dark:text-slate-400">Всего привычек</p>
+              <p className="text-lg font-bold text-slate-800 dark:text-slate-100">{overview.totalHabits}</p>
             </div>
             <div>
-              <p className="text-slate-500">Средний % выполнения</p>
-              <p className="text-lg font-bold">{overview.avgCompletionRate}%</p>
+              <p className="text-slate-500 dark:text-slate-400">Средний % выполнения</p>
+              <p className="text-lg font-bold text-slate-800 dark:text-slate-100">{overview.avgCompletionRate}%</p>
             </div>
             <div>
-              <p className="text-slate-500">Самая успешная</p>
-              <p className="text-lg font-bold">{overview.mostSuccessfulHabit?.title || "—"}</p>
+              <p className="text-slate-500 dark:text-slate-400">Самая успешная</p>
+              <p className="text-lg font-bold text-slate-800 dark:text-slate-100">{overview.mostSuccessfulHabit?.title || "—"}</p>
             </div>
           </div>
         </div>
       )}
 
       {habits.length > 0 && (
-        <div className="bg-white border border-slate-200 rounded-xl p-5">
+        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="font-semibold text-slate-700">Прогресс по привычке</h2>
+            <h2 className="font-semibold text-slate-700 dark:text-slate-200">Прогресс по привычке</h2>
             <select
               value={selectedHabitId || ""}
               onChange={(e) => setSelectedHabitId(e.target.value)}
-              className="border border-slate-300 rounded-md px-3 py-1.5 text-sm"
+              className="border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 rounded-md px-3 py-1.5 text-sm"
             >
               {habits.map((h) => (
                 <option key={h.id} value={h.id}>

@@ -25,32 +25,32 @@ export default function Register() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50">
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900">
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-8 rounded-xl shadow-sm border border-slate-200 w-full max-w-sm"
+        className="bg-white dark:bg-slate-800 p-8 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 w-full max-w-sm"
       >
-        <h1 className="text-xl font-bold mb-6">Регистрация</h1>
+        <h1 className="text-xl font-bold mb-6 text-slate-800 dark:text-slate-100">Регистрация</h1>
 
         {error && (
-          <div className="bg-red-50 text-red-600 text-sm rounded-md px-3 py-2 mb-4">{error}</div>
+          <div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-sm rounded-md px-3 py-2 mb-4">{error}</div>
         )}
 
-        <label className="text-sm text-slate-600">Email</label>
+        <label className="text-sm text-slate-600 dark:text-slate-300">Email</label>
         <input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full mt-1 mb-4 border border-slate-300 rounded-md px-3 py-2 text-sm"
+          className="w-full mt-1 mb-4 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 rounded-md px-3 py-2 text-sm"
           required
         />
 
-        <label className="text-sm text-slate-600">Пароль (мин. 6 символов)</label>
+        <label className="text-sm text-slate-600 dark:text-slate-300">Пароль (мин. 6 символов)</label>
         <input
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full mt-1 mb-6 border border-slate-300 rounded-md px-3 py-2 text-sm"
+          className="w-full mt-1 mb-6 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 rounded-md px-3 py-2 text-sm"
           minLength={6}
           required
         />
@@ -63,7 +63,7 @@ export default function Register() {
           {loading ? "Создаём..." : "Зарегистрироваться"}
         </button>
 
-        <p className="text-sm text-slate-500 mt-4 text-center">
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-4 text-center">
           Уже есть аккаунт?{" "}
           <Link to="/login" className="text-indigo-600 hover:underline">
             Войти

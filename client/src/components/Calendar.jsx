@@ -6,7 +6,7 @@ export default function Calendar({ logs = [], color = "#6366f1" }) {
 
   return (
     <div>
-      <h4 className="text-sm font-medium text-slate-600 mb-2">Последние 30 дней</h4>
+      <h4 className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-2">Последние 30 дней</h4>
       <div className="grid grid-cols-10 gap-1.5">
         {days.map((day) => {
           const done = completedSet.has(day);
@@ -14,8 +14,8 @@ export default function Calendar({ logs = [], color = "#6366f1" }) {
             <div
               key={day}
               title={`${formatDate(day)}${done ? " — выполнено" : ""}`}
-              className="w-6 h-6 rounded-sm"
-              style={{ backgroundColor: done ? color : "#e2e8f0" }}
+              className={`w-6 h-6 rounded-sm ${done ? "" : "bg-slate-200 dark:bg-slate-700"}`}
+              style={done ? { backgroundColor: color } : undefined}
             />
           );
         })}
