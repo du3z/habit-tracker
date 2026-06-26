@@ -1,12 +1,14 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth.js";
 
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState("test@example.com");
-  const [password, setPassword] = useState("password123");
+  const location = useLocation();
+  const justRegistered = location.state?.registered;
+  const [email, setEmail] = useState(location.state?.email || "test@example.com");
+  const [password, setPassword] = useState(justRegistered ? "" : "password123");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -31,9 +33,16 @@ export default function Login() {
         className="bg-white dark:bg-slate-800 p-8 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 w-full max-w-sm"
       >
         <h1 className="text-xl font-bold mb-1 text-slate-800 dark:text-slate-100">Вход</h1>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
-          Тестовый аккаунт уже заполнен — просто нажмите «Войти».
-        </p>
+
+        {justRegistered ? (
+          <div className="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-sm rounded-md px-3 py-2 mb-4">
+            Регистрация прошла успешно! Теперь войдите в свой аккаунт.
+          </div>
+        ) : (
+          <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
+            Тестовый аккаунт уже заполнен — просто нажмите «Войти».
+          </p>
+        )}
 
         {error && (
           <div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-sm rounded-md px-3 py-2 mb-4">{error}</div>

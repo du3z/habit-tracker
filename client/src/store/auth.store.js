@@ -27,10 +27,11 @@ export const useAuthStore = create((set) => ({
     set({ user, token });
   },
 
-  async register(email, password) {
-    const { user, token } = await authApi.register({ email, password });
-    localStorage.setItem("token", token);
-    set({ user, token });
+  // Регистрация только создаёт аккаунт — НЕ логинит автоматически.
+  // Пользователь должен сам войти после регистрации (см. страницу Register/Login).
+  async register(email, password, passwordConfirm, agreeTerms) {
+    const { user } = await authApi.register({ email, password, passwordConfirm, agreeTerms });
+    return user;
   },
 
   logout() {
