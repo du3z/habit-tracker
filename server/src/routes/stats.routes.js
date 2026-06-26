@@ -7,6 +7,7 @@ const router = Router();
 router.use(authMiddleware);
 
 router.get("/overview", statsController.overview);
+router.get("/history", statsController.history);
 router.get("/:habitId", statsController.forHabit);
 
 export default router;

@@ -18,4 +18,14 @@ export const statsController = {
       next(err);
     }
   },
+
+  async history(req, res, next) {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit, 10) : 200;
+      const history = await statsService.history(req.userId, limit);
+      res.json({ history });
+    } catch (err) {
+      next(err);
+    }
+  },
 };
