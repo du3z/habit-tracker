@@ -24,7 +24,7 @@ export default function Analytics() {
   const [habitDetail, setHabitDetail] = useState(null);
 
   useEffect(() => {
-    fetchHabits({ archived: "false" });
+    fetchHabits({ view: "active" });
     statsApi.overview().then(setOverview);
   }, []);
 
