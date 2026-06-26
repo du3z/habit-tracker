@@ -58,3 +58,39 @@ export function WeeklyBarChart({ data, color = "#6366f1" }) {
     </ResponsiveContainer>
   );
 }
+
+export function WeekdayBarChart({ data, color = "#6366f1" }) {
+  const c = useChartColors();
+  return (
+    <ResponsiveContainer width="100%" height={220}>
+      <BarChart data={data}>
+        <CartesianGrid strokeDasharray="3 3" stroke={c.grid} />
+        <XAxis dataKey="day" tick={{ fontSize: 11, fill: c.tick }} />
+        <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: c.tick }} />
+        <Tooltip
+          contentStyle={{ backgroundColor: c.tooltipBg, border: `1px solid ${c.tooltipBorder}`, fontSize: 12 }}
+          labelStyle={{ color: c.tooltipText }}
+        />
+        <Bar dataKey="count" fill={color} radius={[4, 4, 0, 0]} />
+      </BarChart>
+    </ResponsiveContainer>
+  );
+}
+
+export function MonthlyBarChart({ data, color = "#6366f1" }) {
+  const c = useChartColors();
+  return (
+    <ResponsiveContainer width="100%" height={220}>
+      <BarChart data={data}>
+        <CartesianGrid strokeDasharray="3 3" stroke={c.grid} />
+        <XAxis dataKey="month" tick={{ fontSize: 11, fill: c.tick }} />
+        <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: c.tick }} />
+        <Tooltip
+          contentStyle={{ backgroundColor: c.tooltipBg, border: `1px solid ${c.tooltipBorder}`, fontSize: 12 }}
+          labelStyle={{ color: c.tooltipText }}
+        />
+        <Bar dataKey="count" fill={color} radius={[4, 4, 0, 0]} />
+      </BarChart>
+    </ResponsiveContainer>
+  );
+}
