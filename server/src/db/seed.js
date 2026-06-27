@@ -39,6 +39,7 @@ async function seed() {
       // высокая и стабильная успешность, чуть растёт со временем (привычка закрепляется)
       probability: (daysAgo) => 0.55 + (DAYS_HISTORY - daysAgo) / DAYS_HISTORY * 0.35,
       forcedRecentStreakDays: 6,
+      todayCompleted: true, // уже отмечена сегодня — кнопка сразу "удалить отметку"
     },
     {
       title: "Тренировка",
@@ -54,6 +55,7 @@ async function seed() {
         const isWeekend = weekday === 0 || weekday === 6;
         return isWeekend ? 0.2 : 0.65;
       },
+      todayCompleted: false, // нужно нажать самому
     },
     {
       title: "Учить английский",
@@ -66,6 +68,7 @@ async function seed() {
       // низкая успешность, с явным провалом в середине периода (бросил и вернулся)
       probability: (daysAgo) => (daysAgo > 30 && daysAgo < 55 ? 0.05 : 0.4),
       forcedRecentStreakDays: 3,
+      todayCompleted: true,
     },
     {
       title: "Медитация",
@@ -76,6 +79,7 @@ async function seed() {
       archived: false,
       completed: false,
       probability: () => 0.5,
+      todayCompleted: false,
     },
     {
       title: "Бросить сладкое",
@@ -136,7 +140,10 @@ async function seed() {
       if (h.endedDaysAgo !== undefined && daysAgo < h.endedDaysAgo) continue;
 
       const forced = h.forcedRecentStreakDays && daysAgo <= h.forcedRecentStreakDays;
-      const completedLog = forced ? true : Math.random() < h.probability(daysAgo, date);
+      let completedLog = forced ? true : Math.random() < h.probability(daysAgo, date);
+      if (daysAgo === 0 && typeof h.todayCompleted === "boolean") {
+        completedLog = h.todayCompleted; // явная фиксация состояния "сегодня" для демо
+      }
 
       if (completedLog) {
         await query(

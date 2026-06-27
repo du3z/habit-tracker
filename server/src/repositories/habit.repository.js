@@ -51,7 +51,20 @@ export const habitRepository = {
       `SELECT * FROM habits WHERE ${conditions.join(" AND ")} ORDER BY created_at DESC`,
       params
     );
-    return rows;
+
+    if (rows.length === 0) return rows;
+
+    // считаем "выполнено сегодня" одним запросом сразу для всех привычек —
+    // это убирает гонку состояний на фронте (без отдельного N+1 запроса на каждую карточку)
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const ids = rows.map((r) => r.id);
+    const { rows: todayLogs } = await query(
+      `SELECT habit_id FROM habit_logs WHERE habit_id = ANY($1) AND date = $2 AND completed = true`,
+      [ids, todayStr]
+    );
+    const doneTodaySet = new Set(todayLogs.map((l) => l.habit_id));
+
+    return rows.map((r) => ({ ...r, completed_today: doneTodaySet.has(r.id) }));
   },
 
   async findById(id) {
