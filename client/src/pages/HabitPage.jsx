@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Flag, Archive } from "lucide-react";
+import { Flag, Archive, Share2 } from "lucide-react";
 import { statsApi } from "../api/stats.api.js";
 import { habitsApi } from "../api/habits.api.js";
 import Calendar from "../components/Calendar.jsx";
 import { WeeklyBarChart } from "../components/Chart.jsx";
+import ShareModal from "../components/ShareModal.jsx";
 import { todayISO } from "../utils/dateHelpers.js";
 
 export default function HabitPage() {
@@ -12,6 +13,7 @@ export default function HabitPage() {
   const navigate = useNavigate();
   const [data, setData] = useState(null);
   const [error, setError] = useState("");
+  const [showShare, setShowShare] = useState(false);
 
   async function load() {
     try {
@@ -73,34 +75,44 @@ export default function HabitPage() {
           <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">{habit.title}</h1>
         </div>
 
-        {isReadOnly ? (
-          <span
-            className={`text-xs font-medium px-2.5 py-1 rounded-full ${
-              habit.completed
-                ? "bg-sky-100 dark:bg-sky-900/40 text-sky-700 dark:text-sky-400"
-                : "bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400"
-            }`}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowShare(true)}
+            className="w-9 h-9 flex items-center justify-center rounded-md text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-colors"
+            title="Поделиться прогрессом"
           >
-            {habit.completed ? "🏁 Завершена" : "🗄 В архиве"}
-          </span>
-        ) : (
-          <div className="flex gap-1">
-            <button
-              onClick={handleComplete}
-              className="w-9 h-9 flex items-center justify-center rounded-md text-slate-400 dark:text-slate-500 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-900/30 transition-colors"
-              title="Завершить привычку (цель достигнута)"
+            <Share2 size={17} />
+          </button>
+
+          {isReadOnly ? (
+            <span
+              className={`text-xs font-medium px-2.5 py-1 rounded-full ${
+                habit.completed
+                  ? "bg-sky-100 dark:bg-sky-900/40 text-sky-700 dark:text-sky-400"
+                  : "bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400"
+              }`}
             >
-              <Flag size={17} />
-            </button>
-            <button
-              onClick={handleArchive}
-              className="w-9 h-9 flex items-center justify-center rounded-md text-slate-400 dark:text-slate-500 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/30 transition-colors"
-              title="Архивировать привычку"
-            >
-              <Archive size={17} />
-            </button>
-          </div>
-        )}
+              {habit.completed ? "🏁 Завершена" : "🗄 В архиве"}
+            </span>
+          ) : (
+            <div className="flex gap-1">
+              <button
+                onClick={handleComplete}
+                className="w-9 h-9 flex items-center justify-center rounded-md text-slate-400 dark:text-slate-500 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-900/30 transition-colors"
+                title="Завершить привычку (цель достигнута)"
+              >
+                <Flag size={17} />
+              </button>
+              <button
+                onClick={handleArchive}
+                className="w-9 h-9 flex items-center justify-center rounded-md text-slate-400 dark:text-slate-500 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/30 transition-colors"
+                title="Архивировать привычку"
+              >
+                <Archive size={17} />
+              </button>
+            </div>
+          )}
+        </div>
       </div>
       {habit.description && <p className="text-slate-500 dark:text-slate-400 mb-6">{habit.description}</p>}
 
@@ -131,6 +143,8 @@ export default function HabitPage() {
         <h4 className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-2">Выполнение по неделям</h4>
         <WeeklyBarChart data={weekly} color={habit.color} />
       </div>
+
+      {showShare && <ShareModal habit={habit} stats={stats} onClose={() => setShowShare(false)} />}
     </div>
   );
 }
