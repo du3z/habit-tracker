@@ -7,6 +7,14 @@ CREATE TABLE IF NOT EXISTS users (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+CREATE TABLE IF NOT EXISTS habit_groups (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  title VARCHAR(255) NOT NULL,
+  color VARCHAR(20) NOT NULL DEFAULT '#6366f1',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
 CREATE TABLE IF NOT EXISTS habits (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -25,6 +33,7 @@ CREATE TABLE IF NOT EXISTS habits (
 -- идемпотентные миграции для уже существующих баз (повторный npm run migrate безопасен)
 ALTER TABLE habits ADD COLUMN IF NOT EXISTS completed BOOLEAN NOT NULL DEFAULT false;
 ALTER TABLE habits ADD COLUMN IF NOT EXISTS completed_at TIMESTAMPTZ;
+ALTER TABLE habits ADD COLUMN IF NOT EXISTS group_id UUID REFERENCES habit_groups(id) ON DELETE SET NULL;
 
 CREATE TABLE IF NOT EXISTS habit_logs (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
