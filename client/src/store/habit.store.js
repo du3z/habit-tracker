@@ -34,10 +34,15 @@ export const useHabitStore = create((set, get) => ({
     set({ habits: get().habits.filter((h) => h.id !== id) });
   },
 
-  // возвращает подтверждённый сервером результат { date, completed },
-  // чтобы UI не угадывал состояние, а брал его напрямую из ответа API
+  // переключает отметку на сервере и сразу синхронно обновляет completed_today
+  // в самом объекте привычки — без отдельного "угадывания" состояния на фронте
   async toggleHabit(id, date) {
     const result = await habitsApi.toggle(id, date);
+    set({
+      habits: get().habits.map((h) =>
+        h.id === id ? { ...h, completed_today: result.completed } : h
+      ),
+    });
     return result;
   },
 

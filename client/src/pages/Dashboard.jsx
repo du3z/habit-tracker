@@ -21,15 +21,12 @@ export default function Dashboard() {
     removeHabit,
     toggleHabit,
     archiveHabit,
-    restoreHabit,
     completeHabit,
     filters,
     setFilters,
   } = useHabitStore();
 
   const [statsById, setStatsById] = useState({});
-  // logsById хранит ПОДТВЕРЖДЁННОЕ сервером состояние "отметка на сегодня" по каждой привычке
-  const [logsById, setLogsById] = useState({});
   const [showForm, setShowForm] = useState(false);
   const [showArchived, setShowArchived] = useState(false);
   const [archivedHabits, setArchivedHabits] = useState([]);
@@ -40,36 +37,16 @@ export default function Dashboard() {
     fetchHabits();
   }, [filters.search, filters.type]);
 
-  // первичная загрузка статистики и статуса "отмечено сегодня" — только когда меняется набор привычек
+  // обновляет только цифры статистики (стрики/%) — completed_today приходит
+  // отдельно вместе со списком привычек и не зависит от этого запроса
   useEffect(() => {
     if (habits.length === 0) {
       setStatsById({});
-      setLogsById({});
       return;
     }
-    loadStatsAndTodayStatus();
+    refreshStatsOnly();
   }, [habits.map((h) => h.id).join(",")]);
 
-  async function loadStatsAndTodayStatus() {
-    const data = await statsApi.overview();
-    setOverview(data);
-    const byId = {};
-    data.habits.forEach((h) => (byId[h.id] = h));
-    setStatsById(byId);
-
-    const today = todayISO();
-    const logsEntries = await Promise.all(
-      habits.map(async (h) => {
-        const detail = await statsApi.forHabit(h.id);
-        const todayLog = detail.logs.find((l) => l.date === today && l.completed);
-        return [h.id, !!todayLog];
-      })
-    );
-    setLogsById(Object.fromEntries(logsEntries));
-  }
-
-  // обновляет только цифры статистики (стрики/%), не трогая logsById —
-  // чтобы не было гонки с оптимистичным/подтверждённым состоянием кнопки
   async function refreshStatsOnly() {
     const data = await statsApi.overview();
     setOverview(data);
@@ -97,11 +74,8 @@ export default function Dashboard() {
     refreshStatsOnly();
   }
 
-  async function handleToggle(id, date) {
-    // ждём подтверждённый сервером результат и используем его напрямую —
-    // никаких догадок о новом состоянии на клиенте
-    const result = await toggleHabit(id, date);
-    setLogsById((prev) => ({ ...prev, [id]: result.completed }));
+  async function handleToggle(id) {
+    await toggleHabit(id, todayISO());
     refreshStatsOnly();
   }
 
@@ -114,7 +88,7 @@ export default function Dashboard() {
   }
 
   async function handleRestore(id) {
-    await restoreHabit(id);
+    await habitsApi.restore(id);
     setArchivedHabits((prev) => prev.filter((h) => h.id !== id));
     fetchHabits();
   }
@@ -256,7 +230,7 @@ export default function Dashboard() {
               key={habit.id}
               habit={habit}
               stats={statsById[habit.id]}
-              doneToday={!!logsById[habit.id]}
+              doneToday={!!habit.completed_today}
               onToggle={handleToggle}
               onArchive={handleArchive}
               onComplete={handleComplete}
