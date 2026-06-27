@@ -10,6 +10,7 @@ import Dashboard from "./pages/Dashboard.jsx";
 import HabitPage from "./pages/HabitPage.jsx";
 import Analytics from "./pages/Analytics.jsx";
 import History from "./pages/History.jsx";
+import Motivation from "./pages/Motivation.jsx";
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
@@ -62,6 +63,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <History />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/motivation"
+          element={
+            <ProtectedRoute>
+              <Motivation />
             </ProtectedRoute>
           }
         />

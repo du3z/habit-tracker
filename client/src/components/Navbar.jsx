@@ -16,9 +16,12 @@ export default function Navbar() {
   return (
     <nav className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-6 py-3 flex items-center justify-between transition-colors">
       <div className="flex items-center gap-6">
-        <span className="font-bold text-indigo-600 dark:text-indigo-400 tracking-tight">
+        <Link
+          to="/"
+          className="font-bold text-indigo-600 dark:text-indigo-400 tracking-tight hover:opacity-80 transition-opacity"
+        >
           Habit Tracker
-        </span>
+        </Link>
         <Link to="/" className="text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 text-sm">
           Дашборд
         </Link>
@@ -27,6 +30,9 @@ export default function Navbar() {
         </Link>
         <Link to="/history" className="text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 text-sm">
           История
+        </Link>
+        <Link to="/motivation" className="text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 text-sm">
+          Мотивация
         </Link>
       </div>
       <div className="flex items-center gap-3">
