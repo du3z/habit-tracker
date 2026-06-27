@@ -27,8 +27,11 @@ export default function HabitPage() {
   }, [id]);
 
   async function handleToggleToday() {
-    await habitsApi.toggle(id, todayISO());
-    load();
+    const result = await habitsApi.toggle(id, todayISO());
+    // сразу применяем подтверждённый сервером результат к кнопке,
+    // не дожидаясь полной перезагрузки статистики
+    setData((prev) => (prev ? { ...prev, completedToday: result.completed } : prev));
+    load(); // обновит стрики/% в фоне
   }
 
   async function handleArchive() {
@@ -54,8 +57,7 @@ export default function HabitPage() {
 
   if (!data) return <div className="px-6 py-8 text-slate-500 dark:text-slate-400">Загрузка...</div>;
 
-  const { habit, stats, logs, weekly } = data;
-  const doneToday = logs.find((l) => l.date === todayISO() && l.completed);
+  const { habit, stats, logs, weekly, completedToday: doneToday } = data;
   // завершённые и архивные привычки — режим "только просмотр", без действий
   const isReadOnly = habit.completed || habit.archived;
 

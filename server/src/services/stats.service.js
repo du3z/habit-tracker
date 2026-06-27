@@ -71,6 +71,11 @@ export const statsService = {
     const byWeekday = aggregateByWeekday(logs);
     const monthly = aggregateByMonth(logs);
 
+    // считаем "выполнено сегодня" на сервере той же логикой, что и в списке привычек —
+    // фронту не нужно самому сравнивать даты и угадывать часовой пояс
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const completedToday = logs.some((l) => l.date.toISOString().slice(0, 10) === todayStr && l.completed);
+
     return {
       habit,
       stats,
@@ -78,6 +83,7 @@ export const statsService = {
       weekly,
       byWeekday,
       monthly,
+      completedToday,
     };
   },
 
