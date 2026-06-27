@@ -5,6 +5,7 @@ import { statsApi } from "../api/stats.api.js";
 import HabitCard from "../components/HabitCard.jsx";
 import ArchivedHabitItem from "../components/ArchivedHabitItem.jsx";
 import WeeklyReportCard from "../components/WeeklyReportCard.jsx";
+import RitualSection from "../components/RitualSection.jsx";
 import { todayISO } from "../utils/dateHelpers.js";
 
 const TYPES = [
@@ -219,6 +220,8 @@ export default function Dashboard() {
           )}
         </div>
       )}
+
+      <RitualSection />
 
       {habits.length === 0 ? (
         <p className="text-slate-500 dark:text-slate-400 text-sm">
