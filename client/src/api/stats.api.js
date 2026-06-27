@@ -5,4 +5,5 @@ export const statsApi = {
   forHabit: (habitId) => api.get(`/stats/${habitId}`).then((r) => r.data),
   history: (limit = 200, onlyActive = false) =>
     api.get("/stats/history", { params: { limit, onlyActive } }).then((r) => r.data.history),
+  weeklyReport: () => api.get("/stats/weekly-report").then((r) => r.data),
 };

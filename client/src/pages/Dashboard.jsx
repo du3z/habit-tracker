@@ -4,6 +4,7 @@ import { habitsApi } from "../api/habits.api.js";
 import { statsApi } from "../api/stats.api.js";
 import HabitCard from "../components/HabitCard.jsx";
 import ArchivedHabitItem from "../components/ArchivedHabitItem.jsx";
+import WeeklyReportCard from "../components/WeeklyReportCard.jsx";
 import { todayISO } from "../utils/dateHelpers.js";
 
 const TYPES = [
@@ -109,6 +110,8 @@ export default function Dashboard() {
           {showForm ? "Отмена" : "+ Новая привычка"}
         </button>
       </div>
+
+      <WeeklyReportCard />
 
       {overview && (
         <div className="grid grid-cols-3 gap-4 mb-8">
