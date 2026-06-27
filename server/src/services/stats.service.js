@@ -1,6 +1,7 @@
 import { habitRepository } from "../repositories/habit.repository.js";
 import { habitLogRepository } from "../repositories/habitLog.repository.js";
 import { calculateStreaks } from "../utils/calculateStreak.js";
+import { query } from "../config/db.js";
 
 const WEEKDAY_LABELS = ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"];
 
@@ -96,6 +97,33 @@ export const statsService = {
       color: r.color,
     }));
   },
+
+  /**
+   * Еженедельный отчёт: сравнивает последнюю ПОЛНУЮ неделю (пн-вс) с предыдущей.
+   * "Возможно" (Y) — приближённая оценка: сумма дней внутри недели, когда привычка
+   * уже существовала (start_date <= день недели). Подходит для daily-привычек;
+   * для weekly/custom это грубая оценка "по потенциалу", а не точная цель.
+   */
+  async weeklyReport(userId) {
+    const habits = await habitRepository.findAllByUser(userId, { view: "active" });
+
+    const today = new Date();
+    const thisMonday = mondayOf(today);
+    const lastWeekStart = addDays(thisMonday, -7);
+    const lastWeekEnd = addDays(thisMonday, -1);
+    const prevWeekStart = addDays(thisMonday, -14);
+    const prevWeekEnd = addDays(thisMonday, -8);
+
+    const lastWeek = await computeWeekStats(habits, lastWeekStart, lastWeekEnd);
+    const prevWeek = await computeWeekStats(habits, prevWeekStart, prevWeekEnd);
+
+    return {
+      lastWeek: { ...lastWeek, start: isoDate(lastWeekStart), end: isoDate(lastWeekEnd) },
+      prevWeek: { ...prevWeek, start: isoDate(prevWeekStart), end: isoDate(prevWeekEnd) },
+      diffCompleted: lastWeek.completed - prevWeek.completed,
+      diffRate: lastWeek.rate - prevWeek.rate,
+    };
+  },
 };
 
 function aggregateByWeek(logs) {
@@ -138,4 +166,49 @@ function aggregateByMonth(logs) {
     .sort(([a], [b]) => (a > b ? 1 : -1))
     .slice(-6)
     .map(([month, count]) => ({ month, count }));
+}
+
+function isoDate(d) {
+  return d.toISOString().slice(0, 10);
+}
+
+function addDays(date, days) {
+  const d = new Date(date);
+  d.setDate(d.getDate() + days);
+  return d;
+}
+
+function mondayOf(date) {
+  const d = new Date(date);
+  const day = d.getDay(); // 0 = вс, 1 = пн, ... 6 = сб
+  const diff = day === 0 ? -6 : 1 - day;
+  d.setDate(d.getDate() + diff);
+  return d;
+}
+
+async function computeWeekStats(habits, rangeStart, rangeEnd) {
+  if (habits.length === 0) return { completed: 0, possible: 0, rate: 0 };
+
+  const rangeStartStr = isoDate(rangeStart);
+  const rangeEndStr = isoDate(rangeEnd);
+
+  // possible: сколько дней внутри недели привычка уже существовала
+  let possible = 0;
+  for (const habit of habits) {
+    const habitStart = new Date(habit.start_date) > rangeStart ? new Date(habit.start_date) : rangeStart;
+    if (habitStart > rangeEnd) continue;
+    const days = Math.round((rangeEnd - habitStart) / (1000 * 60 * 60 * 24)) + 1;
+    possible += Math.max(0, days);
+  }
+
+  const ids = habits.map((h) => h.id);
+  const { rows } = await query(
+    `SELECT count(*)::int AS count FROM habit_logs
+     WHERE habit_id = ANY($1) AND completed = true AND date BETWEEN $2 AND $3`,
+    [ids, rangeStartStr, rangeEndStr]
+  );
+  const completed = rows[0]?.count || 0;
+  const rate = possible > 0 ? Math.round((completed / possible) * 100) : 0;
+
+  return { completed, possible, rate };
 }

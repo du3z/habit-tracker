@@ -29,4 +29,13 @@ export const statsController = {
       next(err);
     }
   },
+
+  async weeklyReport(req, res, next) {
+    try {
+      const report = await statsService.weeklyReport(req.userId);
+      res.json(report);
+    } catch (err) {
+      next(err);
+    }
+  },
 };

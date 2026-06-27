@@ -8,6 +8,7 @@ router.use(authMiddleware);
 
 router.get("/overview", statsController.overview);
 router.get("/history", statsController.history);
+router.get("/weekly-report", statsController.weeklyReport);
 router.get("/:habitId", statsController.forHabit);
 
 export default router;
