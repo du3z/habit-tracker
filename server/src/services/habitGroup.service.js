@@ -12,10 +12,6 @@ async function assertOwnership(groupId, userId) {
   return group;
 }
 
-/**
- * День засчитывается в общий стрик ритуала только если ВСЕ привычки-участники
- * отмечены выполненными в этот день (пересечение множеств дат).
- */
 async function computeGroupStats(members) {
   if (members.length === 0) {
     return { currentStreak: 0, bestStreak: 0, completionRate: 0, completedDates: [] };
@@ -32,7 +28,6 @@ async function computeGroupStats(members) {
   }
   const completedDates = [...intersection];
 
-  // ритуал не мог существовать раньше, чем появился последний из его участников
   const startDate = members.reduce(
     (latest, h) => (new Date(h.start_date) > new Date(latest) ? h.start_date : latest),
     members[0].start_date

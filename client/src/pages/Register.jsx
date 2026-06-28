@@ -41,7 +41,7 @@ export default function Register() {
     setLoading(true);
     try {
       await register(email, password, passwordConfirm, agreeTerms);
-      // после регистрации — на страницу логина, автологина нет
+
       navigate("/login", { state: { registered: true, email } });
     } catch (err) {
       const apiErrors = err.response?.data?.errors;

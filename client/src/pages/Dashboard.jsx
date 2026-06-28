@@ -45,8 +45,6 @@ export default function Dashboard() {
     fetchGroups();
   }, []);
 
-  // обновляет только цифры статистики (стрики/%) — completed_today приходит
-  // отдельно вместе со списком привычек и не зависит от этого запроса
   useEffect(() => {
     if (habits.length === 0) {
       setStatsById({});

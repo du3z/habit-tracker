@@ -40,7 +40,7 @@ export default function History() {
   useEffect(() => {
     if (tab === "log" && history === null) {
       statsApi
-        .history(300, true) // onlyActive=true — без архивных и завершённых привычек
+        .history(300, true)
         .then(setHistory)
         .catch((err) => setError(err.response?.data?.message || "Не удалось загрузить историю"));
     }

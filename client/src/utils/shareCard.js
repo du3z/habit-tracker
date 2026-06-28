@@ -1,6 +1,3 @@
-// Генерирует красивую картинку 1080x1350 (формат для историй/постов) со стриком привычки.
-// Работает чисто на Canvas API браузера, без внешних библиотек.
-
 function hexToRgb(hex) {
   const clean = hex.replace("#", "");
   const bigint = parseInt(clean, 16);
@@ -32,14 +29,12 @@ export function generateStreakCard({ title, color, currentStreak, bestStreak, co
   canvas.height = H;
   const ctx = canvas.getContext("2d");
 
-  // фон — диагональный градиент на основе цвета привычки
   const gradient = ctx.createLinearGradient(0, 0, W, H);
   gradient.addColorStop(0, shade(color, 15));
   gradient.addColorStop(1, shade(color, -25));
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, W, H);
 
-  // декоративные полупрозрачные круги
   ctx.save();
   ctx.globalAlpha = 0.12;
   ctx.fillStyle = "#ffffff";
@@ -51,18 +46,15 @@ export function generateStreakCard({ title, color, currentStreak, bestStreak, co
   ctx.fill();
   ctx.restore();
 
-  // бренд сверху
   ctx.fillStyle = "rgba(255,255,255,0.85)";
   ctx.font = "600 32px system-ui, -apple-system, sans-serif";
   ctx.textAlign = "left";
   ctx.fillText("Habit Tracker", 70, 110);
 
-  // название привычки
   ctx.fillStyle = "#ffffff";
   ctx.font = "600 48px system-ui, -apple-system, sans-serif";
   wrapText(ctx, title, 70, 220, W - 140, 56);
 
-  // огромный номер стрика по центру
   ctx.textAlign = "center";
   ctx.font = "800 280px system-ui, -apple-system, sans-serif";
   ctx.fillStyle = "#ffffff";
@@ -72,7 +64,6 @@ export function generateStreakCard({ title, color, currentStreak, bestStreak, co
   ctx.fillStyle = "rgba(255,255,255,0.9)";
   ctx.fillText(currentStreak === 1 ? "день подряд 🔥" : "дней подряд 🔥", W / 2, H / 2 + 130);
 
-  // нижняя плашка со статами
   const cardY = H - 260;
   ctx.fillStyle = "rgba(255,255,255,0.15)";
   roundedRect(ctx, 70, cardY, W - 140, 160, 24);

@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS habits (
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   title VARCHAR(255) NOT NULL,
   description TEXT,
-  type VARCHAR(20) NOT NULL DEFAULT 'daily', -- daily | weekly | custom
+  type VARCHAR(20) NOT NULL DEFAULT 'daily',
   color VARCHAR(20) NOT NULL DEFAULT '#6366f1',
   target_days INT NOT NULL DEFAULT 30,
   start_date DATE NOT NULL DEFAULT CURRENT_DATE,
@@ -30,7 +30,6 @@ CREATE TABLE IF NOT EXISTS habits (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- идемпотентные миграции для уже существующих баз (повторный npm run migrate безопасен)
 ALTER TABLE habits ADD COLUMN IF NOT EXISTS completed BOOLEAN NOT NULL DEFAULT false;
 ALTER TABLE habits ADD COLUMN IF NOT EXISTS completed_at TIMESTAMPTZ;
 ALTER TABLE habits ADD COLUMN IF NOT EXISTS group_id UUID REFERENCES habit_groups(id) ON DELETE SET NULL;

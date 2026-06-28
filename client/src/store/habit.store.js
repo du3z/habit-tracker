@@ -42,9 +42,6 @@ export const useHabitStore = create((set, get) => ({
     set({ habits: get().habits.filter((h) => h.id !== id) });
   },
 
-  // возвращает подтверждённый сервером результат { date, completed } и сразу
-  // обновляет completed_today в самой привычке + пересчитывает статистику ритуалов,
-  // в которых она состоит (общий стрик зависит от логов участников)
   async toggleHabit(id, date) {
     const result = await habitsApi.toggle(id, date);
     set({

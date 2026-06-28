@@ -45,7 +45,6 @@ export const statsService = {
       completionRate: stats.completionRate,
     }));
 
-    // рейтинг привычек по % выполнения, для таблицы в аналитике
     const ranking = [...habitSummaries].sort((a, b) => b.completionRate - a.completionRate);
 
     return {
@@ -72,8 +71,6 @@ export const statsService = {
     const byWeekday = aggregateByWeekday(logs);
     const monthly = aggregateByMonth(logs);
 
-    // считаем "выполнено сегодня" на сервере той же логикой, что и в списке привычек —
-    // фронту не нужно самому сравнивать даты и угадывать часовой пояс
     const todayStr = new Date().toISOString().slice(0, 10);
     const completedToday = logs.some((l) => l.date.toISOString().slice(0, 10) === todayStr && l.completed);
 
@@ -98,12 +95,6 @@ export const statsService = {
     }));
   },
 
-  /**
-   * Еженедельный отчёт: сравнивает последнюю ПОЛНУЮ неделю (пн-вс) с предыдущей.
-   * "Возможно" (Y) — приближённая оценка: сумма дней внутри недели, когда привычка
-   * уже существовала (start_date <= день недели). Подходит для daily-привычек;
-   * для weekly/custom это грубая оценка "по потенциалу", а не точная цель.
-   */
   async weeklyReport(userId) {
     const habits = await habitRepository.findAllByUser(userId, { view: "active" });
 
@@ -149,7 +140,7 @@ function aggregateByWeekday(logs) {
     const day = new Date(log.date).getDay();
     counts[day] += 1;
   }
-  // начинаем неделю с понедельника для привычного отображения
+
   const order = [1, 2, 3, 4, 5, 6, 0];
   return order.map((day) => ({ day: WEEKDAY_LABELS[day], count: counts[day] }));
 }
@@ -180,7 +171,7 @@ function addDays(date, days) {
 
 function mondayOf(date) {
   const d = new Date(date);
-  const day = d.getDay(); // 0 = вс, 1 = пн, ... 6 = сб
+  const day = d.getDay();
   const diff = day === 0 ? -6 : 1 - day;
   d.setDate(d.getDate() + diff);
   return d;
@@ -192,7 +183,6 @@ async function computeWeekStats(habits, rangeStart, rangeEnd) {
   const rangeStartStr = isoDate(rangeStart);
   const rangeEndStr = isoDate(rangeEnd);
 
-  // possible: сколько дней внутри недели привычка уже существовала
   let possible = 0;
   for (const habit of habits) {
     const habitStart = new Date(habit.start_date) > rangeStart ? new Date(habit.start_date) : rangeStart;

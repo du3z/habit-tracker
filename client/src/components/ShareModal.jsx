@@ -33,7 +33,7 @@ export default function ShareModal({ habit, stats, onClose }) {
         text: `${habit.title} — ${stats.currentStreak} дней подряд 🔥`,
       });
     } catch {
-      // пользователь отменил шеринг или браузер не поддерживает — просто молчим
+
     }
   }
 

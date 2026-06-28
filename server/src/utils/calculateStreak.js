@@ -1,16 +1,9 @@
 import { toISODate } from "./dateHelpers.js";
 
-/**
- * Принимает массив выполненных дат (YYYY-MM-DD, completed=true) и считает:
- * - currentStreak: текущая серия подряд идущих дней до сегодня
- * - bestStreak: лучшая серия за всё время
- * - completionRate: % выполнения от первого дня привычки до сегодня
- */
 export function calculateStreaks(completedDates, startDate) {
   const dateSet = new Set(completedDates);
   const sorted = [...completedDates].sort();
 
-  // best streak: проходим по отсортированным датам, считаем максимум подряд идущих
   let bestStreak = 0;
   let running = 0;
   let prevDate = null;
@@ -27,10 +20,9 @@ export function calculateStreaks(completedDates, startDate) {
     prevDate = dateStr;
   }
 
-  // current streak: идём от сегодня назад, пока день есть в dateSet
   let currentStreak = 0;
   let cursor = new Date();
-  // если сегодня ещё не отмечено, начинаем считать со вчера (чтобы не сбрасывать стрик сразу)
+
   if (!dateSet.has(toISODate(cursor))) {
     cursor.setDate(cursor.getDate() - 1);
   }
@@ -39,7 +31,6 @@ export function calculateStreaks(completedDates, startDate) {
     cursor.setDate(cursor.getDate() - 1);
   }
 
-  // % выполнения с момента start_date до сегодня (включительно)
   const start = new Date(startDate);
   const today = new Date();
   const totalDays =

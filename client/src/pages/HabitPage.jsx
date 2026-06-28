@@ -51,7 +51,7 @@ export default function HabitPage() {
   if (!data) return <div className="px-6 py-8 text-slate-500 dark:text-slate-400">Загрузка...</div>;
 
   const { habit, stats, logs, weekly } = data;
-  // завершённые и архивные привычки — режим "только просмотр", без действий
+
   const isReadOnly = habit.completed || habit.archived;
 
   return (

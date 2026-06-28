@@ -32,7 +32,7 @@ export const habitGroupRepository = {
   },
 
   async remove(id) {
-    // FK ON DELETE SET NULL сам очистит group_id у привычек-участников
+
     await query(`DELETE FROM habit_groups WHERE id = $1`, [id]);
   },
 

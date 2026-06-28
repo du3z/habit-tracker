@@ -50,8 +50,8 @@ export default function Motivation() {
         Немного поддержки, чтобы не бросить начатое. Листай — тут немного.
       </p>
 
-      {/* контейнер-"сцена" с декоративными пятнами под карточкой, чтобы цитата
-          не торчала "голым" ярким прямоугольником посреди светлого фона */}
+      {
+}
       <div className="relative rounded-3xl bg-slate-100 dark:bg-slate-800/50 p-6 sm:p-10 mb-6 overflow-hidden">
         <div
           className="absolute -top-10 -left-10 w-40 h-40 rounded-full opacity-30 blur-3xl"

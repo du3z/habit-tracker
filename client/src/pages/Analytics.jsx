@@ -55,7 +55,7 @@ export default function Analytics() {
     <div className="max-w-5xl mx-auto px-6 py-8 space-y-8">
       <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Аналитика</h1>
 
-      {/* Сводка по всем привычкам */}
+      {}
       {overview && (
         <section className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5">
           <h2 className="font-semibold text-slate-700 dark:text-slate-200 mb-3">
@@ -82,7 +82,7 @@ export default function Analytics() {
             </div>
           </div>
 
-          {/* Рейтинг привычек */}
+          {}
           {overview.ranking?.length > 0 && (
             <div>
               <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500 mb-2">
@@ -112,7 +112,7 @@ export default function Analytics() {
         </section>
       )}
 
-      {/* Подробный анализ по выбранной привычке */}
+      {}
       {habits.length > 0 && (
         <section className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5">
           <div className="flex items-center justify-between mb-4">
@@ -134,7 +134,7 @@ export default function Analytics() {
 
           {habitDetail && (
             <div className="space-y-6">
-              {/* краткие выводы */}
+              {}
               <div className="grid grid-cols-3 gap-3 text-sm">
                 <Insight
                   label="Лучший день недели"

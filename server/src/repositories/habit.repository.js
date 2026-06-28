@@ -19,13 +19,6 @@ export const habitRepository = {
     return rows[0];
   },
 
-  /**
-   * view:
-   *  - "active"    (по умолчанию) — не в архиве и не завершена
-   *  - "archived"  — только архивные
-   *  - "completed" — только завершённые (цель достигнута)
-   *  - "all"       — без фильтра по статусу
-   */
   async findAllByUser(userId, { view = "active", search = "", type = "" } = {}) {
     const conditions = ["user_id = $1"];
     const params = [userId];
@@ -54,8 +47,6 @@ export const habitRepository = {
 
     if (rows.length === 0) return rows;
 
-    // считаем "выполнено сегодня" одним запросом сразу для всех привычек —
-    // это убирает гонку состояний на фронте (без отдельного N+1 запроса на каждую карточку)
     const todayStr = new Date().toISOString().slice(0, 10);
     const ids = rows.map((r) => r.id);
     const { rows: todayLogs } = await query(

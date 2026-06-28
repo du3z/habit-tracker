@@ -3,7 +3,7 @@ import { pool, query } from "../config/db.js";
 
 const TEST_EMAIL = "test@example.com";
 const TEST_PASSWORD = "password123";
-const DAYS_HISTORY = 90; // ~3 месяца истории для активных привычек
+const DAYS_HISTORY = 90;
 
 function isoDate(d) {
   return d.toISOString().slice(0, 10);
@@ -14,32 +14,30 @@ function addDays(date, days) {
   return d;
 }
 
-// ───────────────────────── профили вероятности выполнения ─────────────────────────
 const profiles = {
   high: () => 0.85,
   mediumHigh: () => 0.65,
   medium: () => 0.5,
   low: () => 0.3,
   veryLow: () => 0.18,
-  // растёт со временем — привычка закрепляется
+
   rising: (daysAgo) => 0.4 + ((DAYS_HISTORY - daysAgo) / DAYS_HISTORY) * 0.45,
-  // выше по будням, ниже в выходные
+
   weekdayHeavy: (daysAgo, date) => {
     const isWeekend = date.getDay() === 0 || date.getDay() === 6;
     return isWeekend ? 0.2 : 0.7;
   },
-  // выше в выходные (прогулки, хобби)
+
   weekendHeavy: (daysAgo, date) => {
     const isWeekend = date.getDay() === 0 || date.getDay() === 6;
     return isWeekend ? 0.8 : 0.35;
   },
-  // провал в середине периода — бросил и вернулся
+
   dipAndRecover: (daysAgo) => (daysAgo > 30 && daysAgo < 55 ? 0.05 : 0.45),
-  // нестабильная, скачет туда-сюда
+
   volatile: (daysAgo) => (Math.floor(daysAgo / 5) % 2 === 0 ? 0.7 : 0.2),
 };
 
-// ───────────────────────── активные привычки (10) ─────────────────────────
 const ACTIVE_HABITS = [
   { title: "Читать 30 минут", description: "Чтение книги перед сном", type: "daily", color: "#6366f1", profile: "rising", forcedRecentStreakDays: 6, todayCompleted: true },
   { title: "Тренировка", description: "Зал или домашняя тренировка", type: "custom", color: "#22c55e", profile: "weekdayHeavy", todayCompleted: false },
@@ -53,7 +51,6 @@ const ACTIVE_HABITS = [
   { title: "Без соцсетей до обеда", description: "Телефон в другой комнате с утра", type: "daily", color: "#f97316", profile: "volatile", todayCompleted: false },
 ];
 
-// ───────────────────────── архивные привычки (10) — заброшены на разных этапах ─────────────────────────
 const ARCHIVED_HABITS = [
   { title: "Бросить сладкое", description: "Старая привычка, уже не отслеживается", color: "#94a3b8", profile: "low", endedDaysAgo: 60 },
   { title: "Бегать по утрам", description: "5 км перед работой", color: "#a8a29e", profile: "mediumHigh", endedDaysAgo: 45 },
@@ -67,7 +64,6 @@ const ARCHIVED_HABITS = [
   { title: "Учить гитару", description: "15 минут аккордов", color: "#fed7aa", profile: "veryLow", endedDaysAgo: 75 },
 ];
 
-// ───────────────────────── завершённые привычки (10) — цель достигнута ─────────────────────────
 const COMPLETED_HABITS = [
   { title: "Отжимания 100 раз в день", description: "Челлендж на 30 дней — цель достигнута!", color: "#0ea5e9", profile: "high", startedDaysAgo: 50, endedDaysAgo: 20 },
   { title: "Без кофе 21 день", description: "Эксперимент с отказом от кофеина", color: "#b45309", profile: "high", startedDaysAgo: 40, endedDaysAgo: 19 },
@@ -81,7 +77,6 @@ const COMPLETED_HABITS = [
   { title: "Дыхательная практика", description: "30 дней дыхательных упражнений", color: "#c026d3", profile: "mediumHigh", startedDaysAgo: 65, endedDaysAgo: 35 },
 ];
 
-// ───────────────────────── готовые ритуалы (группы) из активных привычек ─────────────────────────
 const RITUALS = [
   { title: "Утренний ритуал", color: "#8b5cf6", members: ["Медитация", "Пить 2 литра воды", "Вести дневник"] },
   { title: "ЗОЖ-комбо", color: "#22c55e", members: ["Тренировка", "Спать 8 часов", "Гулять на улице"] },
@@ -150,7 +145,6 @@ async function seed() {
   const today = new Date();
   const habitIdByTitle = {};
 
-  // активные
   for (const def of ACTIVE_HABITS) {
     const startDate = addDays(today, -DAYS_HISTORY);
     const habitId = await insertHabit(userId, def, { startDate });
@@ -159,7 +153,6 @@ async function seed() {
     await insertLogsBatch(habitId, dates);
   }
 
-  // архивные
   for (const def of ARCHIVED_HABITS) {
     const startDate = addDays(today, -DAYS_HISTORY);
     const habitId = await insertHabit(userId, def, { startDate, archived: true });
@@ -167,7 +160,6 @@ async function seed() {
     await insertLogsBatch(habitId, dates);
   }
 
-  // завершённые
   for (const def of COMPLETED_HABITS) {
     const startDate = addDays(today, -def.startedDaysAgo);
     const completedAt = addDays(today, -def.endedDaysAgo);
@@ -176,7 +168,6 @@ async function seed() {
     await insertLogsBatch(habitId, dates);
   }
 
-  // ритуалы (группы) из уже созданных активных привычек
   for (const ritual of RITUALS) {
     const { rows } = await query(
       `INSERT INTO habit_groups (user_id, title, color) VALUES ($1, $2, $3) RETURNING id`,

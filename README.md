@@ -13,8 +13,8 @@
 
 ```
 habit-tracker/
-├── server/   # Node.js + Express + PostgreSQL backend
-├── client/   # React frontend
+├── server/
+├── client/
 └── docker-compose.yml
 ```
 
@@ -25,7 +25,7 @@ habit-tracker/
 ```bash
 docker compose up -d
 ```
-Поднимет PostgreSQL на порту 5432 (db: `habit_tracker`, user/pass: `postgres`/`postgres`).
+Поднимет PostgreSQL на порту 5433 (db: `habit_tracker`, user/pass: `postgres`/`postgres`).
 
 ### 2. Backend
 
@@ -33,9 +33,9 @@ docker compose up -d
 cd server
 cp .env.example .env
 npm install
-npm run migrate   # создаёт таблицы
-npm run seed       # тестовый пользователь + привычки + логи
-npm run dev         # http://localhost:4000
+npm run migrate
+npm run seed
+npm run dev
 ```
 
 ### 3. Frontend
@@ -44,7 +44,7 @@ npm run dev         # http://localhost:4000
 cd client
 cp .env.example .env
 npm install
-npm run dev         # http://localhost:5173
+npm run dev
 ```
 
 ## Тестовые данные
