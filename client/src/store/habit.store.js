@@ -1,8 +1,10 @@
 import { create } from "zustand";
 import { habitsApi } from "../api/habits.api.js";
+import { groupsApi } from "../api/groups.api.js";
 
 export const useHabitStore = create((set, get) => ({
   habits: [],
+  groups: [],
   loading: false,
   filters: { search: "", type: "", view: "active" },
 
@@ -16,6 +18,12 @@ export const useHabitStore = create((set, get) => ({
     const habits = await habitsApi.list(filters);
     set({ habits, loading: false });
     return habits;
+  },
+
+  async fetchGroups() {
+    const groups = await groupsApi.list();
+    set({ groups });
+    return groups;
   },
 
   async createHabit(data) {
@@ -34,8 +42,9 @@ export const useHabitStore = create((set, get) => ({
     set({ habits: get().habits.filter((h) => h.id !== id) });
   },
 
-  // переключает отметку на сервере и сразу синхронно обновляет completed_today
-  // в самом объекте привычки — без отдельного "угадывания" состояния на фронте
+  // возвращает подтверждённый сервером результат { date, completed } и сразу
+  // обновляет completed_today в самой привычке + пересчитывает статистику ритуалов,
+  // в которых она состоит (общий стрик зависит от логов участников)
   async toggleHabit(id, date) {
     const result = await habitsApi.toggle(id, date);
     set({
@@ -43,12 +52,14 @@ export const useHabitStore = create((set, get) => ({
         h.id === id ? { ...h, completed_today: result.completed } : h
       ),
     });
+    get().fetchGroups();
     return result;
   },
 
   async archiveHabit(id) {
     await habitsApi.archive(id);
     set({ habits: get().habits.filter((h) => h.id !== id) });
+    get().fetchGroups();
   },
 
   async restoreHabit(id) {
@@ -59,6 +70,7 @@ export const useHabitStore = create((set, get) => ({
   async completeHabit(id) {
     await habitsApi.complete(id);
     set({ habits: get().habits.filter((h) => h.id !== id) });
+    get().fetchGroups();
   },
 
   async reopenHabit(id) {

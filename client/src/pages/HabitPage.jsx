@@ -6,7 +6,6 @@ import { habitsApi } from "../api/habits.api.js";
 import Calendar from "../components/Calendar.jsx";
 import { WeeklyBarChart } from "../components/Chart.jsx";
 import ShareModal from "../components/ShareModal.jsx";
-import { todayISO } from "../utils/dateHelpers.js";
 
 export default function HabitPage() {
   const { id } = useParams();
@@ -27,14 +26,6 @@ export default function HabitPage() {
   useEffect(() => {
     load();
   }, [id]);
-
-  async function handleToggleToday() {
-    const result = await habitsApi.toggle(id, todayISO());
-    // сразу применяем подтверждённый сервером результат к кнопке,
-    // не дожидаясь полной перезагрузки статистики
-    setData((prev) => (prev ? { ...prev, completedToday: result.completed } : prev));
-    load(); // обновит стрики/% в фоне
-  }
 
   async function handleArchive() {
     await habitsApi.archive(id);
@@ -59,7 +50,7 @@ export default function HabitPage() {
 
   if (!data) return <div className="px-6 py-8 text-slate-500 dark:text-slate-400">Загрузка...</div>;
 
-  const { habit, stats, logs, weekly, completedToday: doneToday } = data;
+  const { habit, stats, logs, weekly } = data;
   // завершённые и архивные привычки — режим "только просмотр", без действий
   const isReadOnly = habit.completed || habit.archived;
 
@@ -121,19 +112,6 @@ export default function HabitPage() {
         <StatBox label="Лучший стрик" value={stats.bestStreak} />
         <StatBox label="% выполнения" value={`${stats.completionRate}%`} />
       </div>
-
-      {!isReadOnly && (
-        <button
-          onClick={handleToggleToday}
-          className={`mb-8 text-sm font-medium rounded-md px-4 py-2 transition-colors ${
-            doneToday
-              ? "bg-white dark:bg-slate-800 border border-red-300 dark:border-red-500/50 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
-              : "bg-indigo-600 text-white hover:bg-indigo-700"
-          }`}
-        >
-          {doneToday ? "✓ Выполнено · удалить отметку" : "Отметить выполнено сегодня"}
-        </button>
-      )}
 
       <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5 mb-6">
         <Calendar logs={logs} color={habit.color} />

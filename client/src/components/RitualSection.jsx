@@ -1,24 +1,14 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Sparkles, Trash2 } from "lucide-react";
 import { groupsApi } from "../api/groups.api.js";
 import { habitsApi } from "../api/habits.api.js";
 import ProgressBar from "./ProgressBar.jsx";
 
-export default function RitualSection() {
-  const [groups, setGroups] = useState(null);
+export default function RitualSection({ groups, onRefresh }) {
   const [showForm, setShowForm] = useState(false);
   const [allHabits, setAllHabits] = useState([]);
   const [form, setForm] = useState({ title: "", color: "#8b5cf6", habitIds: [] });
   const [error, setError] = useState("");
-
-  useEffect(() => {
-    loadGroups();
-  }, []);
-
-  async function loadGroups() {
-    const list = await groupsApi.list();
-    setGroups(list);
-  }
 
   async function openForm() {
     const habits = await habitsApi.list({ view: "active" });
@@ -46,7 +36,7 @@ export default function RitualSection() {
     try {
       await groupsApi.create(form);
       setShowForm(false);
-      loadGroups();
+      onRefresh();
     } catch (err) {
       setError(err.response?.data?.message || "Не удалось создать ритуал");
     }
@@ -54,10 +44,9 @@ export default function RitualSection() {
 
   async function handleDelete(id) {
     await groupsApi.remove(id);
-    setGroups((prev) => prev.filter((g) => g.id !== id));
+    onRefresh();
   }
 
-  if (groups === null) return null;
   if (groups.length === 0 && !showForm) {
     return (
       <div className="mb-8">

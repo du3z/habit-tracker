@@ -18,7 +18,9 @@ const TYPES = [
 export default function Dashboard() {
   const {
     habits,
+    groups,
     fetchHabits,
+    fetchGroups,
     createHabit,
     removeHabit,
     toggleHabit,
@@ -38,6 +40,10 @@ export default function Dashboard() {
   useEffect(() => {
     fetchHabits();
   }, [filters.search, filters.type]);
+
+  useEffect(() => {
+    fetchGroups();
+  }, []);
 
   // обновляет только цифры статистики (стрики/%) — completed_today приходит
   // отдельно вместе со списком привычек и не зависит от этого запроса
@@ -221,7 +227,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      <RitualSection />
+      <RitualSection groups={groups} onRefresh={fetchGroups} />
 
       {habits.length === 0 ? (
         <p className="text-slate-500 dark:text-slate-400 text-sm">
