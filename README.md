@@ -25,7 +25,7 @@ habit-tracker/
 ```bash
 docker compose up -d
 ```
-Поднимет PostgreSQL на порту 5433 (db: `habit_tracker`, user/pass: `postgres`/`postgres`).
+Поднимет PostgreSQL на порту 5433 (db: `habit_tracker`, user/pass: `postgres`/`postgres`)..
 
 ### 2. Backend
 
